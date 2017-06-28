@@ -50,6 +50,10 @@
 /// contained within it.
 namespace BWAPI
 {
+  // Fixed revision number like in
+  // https://github.com/bwapi/bwapi/commit/bc07b566e92e415cca9c658c51b14a449fb3d8d0
+  static const int BWAPI_REVISION = 4708;
+
   /// <summary>Retrieves the revision of the BWAPILIB module currently being used.</summary>
   ///
   /// @returns
