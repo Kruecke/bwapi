@@ -17,7 +17,7 @@
  *      2  - stderr
  * (1 | 2) - both
  */
-#define BWAPI_CLIENT_VERBOSITY (1 | 2)
+#define BWAPI_CLIENT_VERBOSITY 0
 
 namespace BWAPI
 {
