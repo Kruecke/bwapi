@@ -8,6 +8,16 @@
 
 #include "../WindowsTypes.h"
 
+/* Added, because the default implementation
+ * put to much stuff to stdout and stderr.
+ *
+ * BWAPI_CLIENT_VERBOSITY:
+ *      0  - no output
+ *      1  - stdout
+ *      2  - stderr
+ * (1 | 2) - both
+ */
+#define BWAPI_CLIENT_VERBOSITY (1 | 2)
 
 namespace BWAPI
 {

@@ -26,7 +26,9 @@ namespace BWAPI
   {
     if ( this->connected )
     {
+#if BWAPI_CLIENT_VERBOSITY & 1
       std::cout << "Already connected." << std::endl;
+#endif
       return true;
     }
 
@@ -37,13 +39,17 @@ namespace BWAPI
     this->gameTableFileHandle = OpenFileMappingA(FILE_MAP_WRITE | FILE_MAP_READ, FALSE, "Local\\bwapi_shared_memory_game_list" );
     if ( !this->gameTableFileHandle )
     {
+#if BWAPI_CLIENT_VERBOSITY & 2
       std::cerr << "Game table mapping not found." << std::endl;
+#endif
       return false;
     }
     this->gameTable = static_cast<GameTable*>( MapViewOfFile(this->gameTableFileHandle, FILE_MAP_WRITE | FILE_MAP_READ, 0, 0, sizeof(GameTable)) );
     if ( !this->gameTable )
     {
+#if BWAPI_CLIENT_VERBOSITY & 2
       std::cerr << "Unable to map Game table." << std::endl;
+#endif
       return false;
     }
 
@@ -51,7 +57,9 @@ namespace BWAPI
     DWORD latest = 0;
     for(int i = 0; i < GameTable::MAX_GAME_INSTANCES; i++)
     {
+#if BWAPI_CLIENT_VERBOSITY & 1
       std::cout << i << " | " << gameTable->gameInstances[i].serverProcessID << " | " << gameTable->gameInstances[i].isConnected << " | " << gameTable->gameInstances[i].lastKeepAliveTime << std::endl;
+#endif
       if (gameTable->gameInstances[i].serverProcessID != 0 && !gameTable->gameInstances[i].isConnected)
       {
         if ( gameTableIndex == -1 || latest == 0 || gameTable->gameInstances[i].lastKeepAliveTime < latest )
@@ -67,7 +75,9 @@ namespace BWAPI
 
     if (serverProcID == -1)
     {
+#if BWAPI_CLIENT_VERBOSITY & 2
       std::cerr << "No server proc ID" << std::endl;
+#endif
       return false;
     }
     
@@ -82,7 +92,9 @@ namespace BWAPI
     pipeObjectHandle = CreateFileA(communicationPipe.str().c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
     if ( pipeObjectHandle == INVALID_HANDLE_VALUE )
     {
+#if BWAPI_CLIENT_VERBOSITY & 2
       std::cerr << "Unable to open communications pipe: " << communicationPipe.str() << std::endl;
+#endif
       CloseHandle(gameTableFileHandle);
       return false;
     }
@@ -95,11 +107,15 @@ namespace BWAPI
     c.WriteTotalTimeoutConstant   = 2000;
     SetCommTimeouts(pipeObjectHandle,&c);
 
+#if BWAPI_CLIENT_VERBOSITY & 1
     std::cout << "Connected" << std::endl;
+#endif
     mapFileHandle = OpenFileMappingA(FILE_MAP_WRITE | FILE_MAP_READ, FALSE, sharedMemoryName.str().c_str());
     if (mapFileHandle == INVALID_HANDLE_VALUE || mapFileHandle == NULL)
     {
+#if BWAPI_CLIENT_VERBOSITY & 2
       std::cerr << "Unable to open shared memory mapping: " << sharedMemoryName.str() << std::endl;
+#endif
       CloseHandle(pipeObjectHandle);
       CloseHandle(gameTableFileHandle);
       return false;
@@ -107,7 +123,9 @@ namespace BWAPI
     data = static_cast<GameData*>( MapViewOfFile(mapFileHandle, FILE_MAP_WRITE | FILE_MAP_READ, 0, 0, sizeof(GameData)) );
     if ( data == nullptr )
     {
+#if BWAPI_CLIENT_VERBOSITY & 2
       std::cerr << "Unable to map game data." << std::endl;
+#endif
       return false;
     }
 
@@ -120,9 +138,11 @@ namespace BWAPI
     if (BWAPI::BWAPI_getRevision() != BWAPI::Broodwar->getRevision())
     {
       //error
+#if BWAPI_CLIENT_VERBOSITY & 2
       std::cerr << "Error: Client and Server are not compatible!" << std::endl;
       std::cerr << "Client Revision: " << BWAPI::BWAPI_getRevision() << std::endl;
       std::cerr << "Server Revision: " << BWAPI::Broodwar->getRevision() << std::endl;
+#endif
       disconnect();
       std::this_thread::sleep_for(std::chrono::milliseconds{ 2000 });
       return false;
@@ -136,12 +156,16 @@ namespace BWAPI
       if ( !success )
       {
         disconnect();
+#if BWAPI_CLIENT_VERBOSITY & 2
         std::cerr << "Unable to read pipe object." << std::endl;
+#endif
         return false;
       }
     }
     
+#if BWAPI_CLIENT_VERBOSITY & 1
     std::cout << "Connection successful" << std::endl;
+#endif
     assert( BWAPI::BroodwarPtr != nullptr);
 
     this->connected = true;
@@ -164,7 +188,9 @@ namespace BWAPI
     mapFileHandle = INVALID_HANDLE_VALUE;
 
     this->connected = false;
+#if BWAPI_CLIENT_VERBOSITY & 1
     std::cout << "Disconnected" << std::endl;
+#endif
 
     if ( BWAPI::BroodwarPtr )
       delete static_cast<GameImpl*>(BWAPI::BroodwarPtr);
@@ -184,7 +210,9 @@ namespace BWAPI
       BOOL success = ReadFile(pipeObjectHandle, &code, sizeof(code), &receivedByteCount, NULL);
       if ( !success )
       {
+#if BWAPI_CLIENT_VERBOSITY & 1
         std::cout << "failed, disconnecting" << std::endl;
+#endif
         disconnect();
         return;
       }
