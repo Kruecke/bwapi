@@ -10,6 +10,7 @@
     <ProjectGuid>{BB8B0BBC-2D1A-4976-A5E0-95D9B5757551}</ProjectGuid>
     <RootNamespace>PKLib</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
